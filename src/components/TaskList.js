@@ -1,56 +1,62 @@
-import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { fetchTasks, deleteTask } from '../api';
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { fetchTasks, deleteTask } from "../api";
 
 function TaskList() {
-    const [tasks, setTasks] = useState([]);
+  const [tasks, setTasks] = useState([]);
 
-    const loadTasks = async () => {
-        const res = await fetchTasks();
-        setTasks(res.data);
-    };
+  const loadTasks = async () => {
+    const res = await fetchTasks();
+    setTasks(res.data);
+  };
 
-    const handleDelete = async (id) => {
-        if (window.confirm('Удалить задачу?')) {
-            await deleteTask(id);
-            loadTasks();
-        }
-    };
+  const handleDelete = async (id) => {
+    if (window.confirm("Удалить задачу?")) {
+      await deleteTask(id);
+      loadTasks();
+    }
+  };
 
-    useEffect(() => {
-        loadTasks();
-    }, []);
+  useEffect(() => {
+    loadTasks();
+  }, []);
 
-    return (
-        <div>
-            <h4>Все задачи</h4>
-            <table className="table table-bordered mt-3">
-                <thead className="table-light">
-                <tr>
-                    <th>Заголовок</th>
-                    <th>Описание</th>
-                    <th>Статус</th>
-                    <th>Срок</th>
-                    <th>Действия</th>
-                </tr>
-                </thead>
-                <tbody>
-                {tasks.map(task => (
-                    <tr key={task.id}>
-                        <td>{task.title}</td>
-                        <td>{task.description}</td>
-                        <td>{task.done ? '✅' : '❌'}</td>
-                        <td>{new Date(task.due_date).toLocaleDateString()}</td>
-                        <td>
-                            <Link className="btn btn-sm btn-warning me-2" to={`/tasks/${task.id}/edit`}>Редактировать</Link>
-                            <button className="btn btn-sm btn-danger" onClick={() => handleDelete(task.id)}>Удалить</button>
-                        </td>
-                    </tr>
-                ))}
-                </tbody>
-            </table>
-        </div>
-    );
+  return (
+    <div>
+      <h2 className="page-title">Все задачи</h2>
+      <div className="task-list">
+        {tasks.map((task) => (
+          <div className="task-card" key={task.id}>
+            {task.image && (
+              <img
+                src={`http://localhost:8080${task.image}`}
+                alt="Task"
+                className="task-image"
+              />
+            )}
+            <div className="task-info">
+              <h3>{task.title}</h3>
+              <p>{task.description}</p>
+              <small className="date">
+                {new Date(task.created_at).toLocaleString()}
+              </small>
+            </div>
+            <div className="task-actions">
+              <Link className="btn-edit" to={`/tasks/${task.id}/edit`}>
+                ✏️
+              </Link>
+              <button
+                className="btn-delete"
+                onClick={() => handleDelete(task.id)}
+              >
+                🗑️
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }
 
 export default TaskList;
